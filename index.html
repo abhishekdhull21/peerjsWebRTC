@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+</head>
+<script src="https://unpkg.com/peerjs@1.3.1/dist/peerjs.min.js"></script>
+<body>
+    <div class="main container m-4">
+        <div class="status"><h3 id="">Realtime Streaming</h3></div>
+        <div class="status"><h3 id="connection-status">waiting for connection</h3></div>
+        <div class="form-group">
+            <label class="control-label" for="myID">My ID</label>
+            <input type="text" id="myID" class="form-control"><br>
+            <label class="control-label" for="peerID">Joiner ID</label>
+            <input type="text" name="" id="peerID" class="form-control"><br>
+            <button  class="btn btn-primary" id="sendOffer">Send Request</button><br><br><br>
+            <textarea name="" id="messageTextArea" class="form-control" cols="30" rows="10"></textarea><br>
+            <button class="btn btn-success" id="sendMessage">Send Message</button><br>
+
+        </div>
+        <div class="mt-4" id="messageBox">
+
+        </div>
+    </div>
+    <script>
+
+        const host="https://9000-peers-peerjsserver-wjntutlmjkh.ws-us30.gitpod.io";
+         const id = "peer1"
+        const pid ="peer2"
+        const peer = new Peer();
+        var conn=null;
+        var status=null;
+        const myID = document.getElementById('myID')
+        const peerIDElement = document.getElementById('peerID')
+        const btnSendOffer = document.getElementById('sendOffer')
+        const btnSendMessage = document.getElementById('sendMessage')
+        const connectionStatusLabel = document.getElementById('connection-status')
+        const messageTextArea = document.getElementById('messageTextArea')
+        const messageBox = document.getElementById('messageBox')
+
+        // console.log(peer);
+        btnSendOffer.addEventListener('click',()=>{
+            peerID = peerIDElement.value;
+             conn =  peer.connect(peerID,{reliable: true});
+             fn();
+        });
+        btnSendMessage.addEventListener('click',()=>{
+            // console.log(conn);
+            if(messageTextArea.value != "" && messageTextArea.value != null)
+            conn.send(messageTextArea.value);
+            messageBox.innerHTML +=(`<h3 style='color:green;'>${messageTextArea.value}</h3>`);
+        });
+        // const conn = peer.connect(pid);
+        peer.on('open', (id) => {
+            myID.value=id;
+       
+        });
+
+        peer.on('connection', function(con) { 
+            console.log("connection received...");
+            conn =con;
+            fn();
+         });
+            
+           
+        
+        //     // Send messages
+            // conn.send('Hello!');
+        // });
+       
+         
+     fn = ()=>{  
+        connectionStatusLabel.innerHTML = "Connected";
+
+       //    conn.on('open', function() {
+        // Receive messages
+        conn.on('data', function(data) {
+
+            console.log('Received', data);
+            messageBox.innerHTML +=(`<h3 style='color:blue;'>${data}</h3>`);
+
+        });
+
+        // });
+    }
+        // peer.call(id,)
+        // console.log(conn);
+    </script>
+</body>
+</html>
